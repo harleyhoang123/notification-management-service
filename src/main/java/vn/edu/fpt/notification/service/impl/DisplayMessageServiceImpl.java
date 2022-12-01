@@ -1,5 +1,6 @@
 package vn.edu.fpt.notification.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -47,7 +48,8 @@ public class DisplayMessageServiceImpl implements DisplayMessageService {
     private final DisplayMessageRepository displayMessageRepository;
     private final MongoTemplate mongoTemplate;
     private final DisplayMessageMapper displayMessageMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Cacheable
@@ -122,7 +124,7 @@ public class DisplayMessageServiceImpl implements DisplayMessageService {
 
     private void publishDisplayMessageToRedis(DisplayMessage displayMessage){
         try{
-            redisTemplate.opsForValue().set(String.format("%s:%s", displayMessage.getCode(), displayMessage.getLanguage()), displayMessage);
+            redisTemplate.opsForValue().set(String.format("%s:%s", displayMessage.getCode(), displayMessage.getLanguage()), objectMapper.writeValueAsString(displayMessage));
         }catch (Exception ex){
             throw new BusinessException(ResponseStatusEnum.INTERNAL_SERVER_ERROR, "Can't save new display message to redis: "+ ex.getMessage());
         }

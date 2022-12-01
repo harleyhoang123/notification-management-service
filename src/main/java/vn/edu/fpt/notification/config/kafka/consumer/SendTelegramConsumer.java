@@ -21,7 +21,7 @@ public class SendTelegramConsumer extends Consumer{
     private final TelegramService telegramService;
 
     @Override
-    @KafkaListener(id = "sendTelegramConsumer", topics = "flab.send_telegram", groupId = "notification_group")
+    @KafkaListener(id = "sendTelegramConsumer", topics = "flab.notification.send_telegram", groupId = "notification_group")
     protected void listen(String value, String topic, String key) {
         super.listen(value, topic, key);
         telegramService.sendNotification(value);

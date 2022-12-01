@@ -2,6 +2,7 @@ package vn.edu.fpt.notification.config.kafka.consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import vn.edu.fpt.notification.service.SmsService;
 
@@ -20,6 +21,7 @@ public class SendSmsConsumer extends Consumer{
     private final SmsService smsService;
 
     @Override
+    @KafkaListener(id = "sendSmsConsumer", topics = "flab.notification.send_sms", groupId = "notification_group")
     protected void listen(String value, String topic, String key) {
         super.listen(value, topic, key);
         smsService.sendSms(value);

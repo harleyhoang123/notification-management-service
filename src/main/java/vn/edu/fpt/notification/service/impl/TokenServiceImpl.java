@@ -53,17 +53,13 @@ public class TokenServiceImpl implements _TokenService {
             return Optional.empty();
         }
 
-        if(!validateId(claims)){
-            return Optional.empty();
-        }
-
-        String subject = claims.getSubject();
+        String id = claims.getId();
 
         String authorities = claims.get("authorities", String.class);
 
         Collection<? extends GrantedAuthority> grantedAuthorities = convertToAuthority(authorities);
 
-        org.springframework.security.core.userdetails.User principal = new User(subject, "", grantedAuthorities);
+        org.springframework.security.core.userdetails.User principal = new User(id, "", grantedAuthorities);
         return Optional.of(new UsernamePasswordAuthenticationToken(principal, token, grantedAuthorities));
 
     }
@@ -80,16 +76,6 @@ public class TokenServiceImpl implements _TokenService {
 
         Long expirationTime = claims.get(Claims.EXPIRATION, Long.class);
         return expirationTime > currentTime;
-    }
-
-    private boolean validateId(Claims claims){
-        String jti = claims.get(Claims.ID, String.class);
-        try {
-            UUID uuid = UUID.fromString(jti);
-            return true;
-        }catch (Exception ex){
-            return false;
-        }
     }
 
     private Collection<? extends GrantedAuthority> convertToAuthority(String authority){

@@ -21,7 +21,7 @@ public class SendEmailConsumer extends Consumer{
     private final EmailService emailService;
 
     @Override
-    @KafkaListener(id = "sendEmailConsumer", topics = "flab.send_email", groupId = "notification_group")
+    @KafkaListener(id = "sendEmailConsumer", topics = "flab.notification.send_email", groupId = "notification_group")
     protected void listen(String value, String topic, String key) {
         super.listen(value, topic, key);
         emailService.sendEmail(value);
