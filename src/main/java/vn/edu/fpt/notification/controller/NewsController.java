@@ -5,8 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.notification.dto.common.GeneralResponse;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.request.comment._CreateCommentRequest;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.UpdateNewsRequest;
+import vn.edu.fpt.notification.dto.response.comment._CreateCommentResponse;
 import vn.edu.fpt.notification.dto.response.news.CreateNewsResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsDetailResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
@@ -30,4 +32,6 @@ public interface NewsController {
             @RequestParam(name = "size", required = false) Integer size
             );
 
+    @PostMapping("/{news-id}/comment")
+    ResponseEntity<GeneralResponse<_CreateCommentResponse>> addCommentToNews(@PathVariable("news-id") String newsId, @RequestBody _CreateCommentRequest request);
 }

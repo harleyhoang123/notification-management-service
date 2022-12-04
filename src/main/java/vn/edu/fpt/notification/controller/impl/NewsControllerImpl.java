@@ -9,9 +9,11 @@ import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.controller.NewsController;
 import vn.edu.fpt.notification.dto.common.GeneralResponse;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.request.comment._CreateCommentRequest;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.UpdateNewsRequest;
+import vn.edu.fpt.notification.dto.response.comment._CreateCommentResponse;
 import vn.edu.fpt.notification.dto.response.news.CreateNewsResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsDetailResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
@@ -25,6 +27,8 @@ public class NewsControllerImpl implements NewsController {
 
     private final ResponseFactory responseFactory;
     private final NewsService newsService;
+
+
     @Override
     public ResponseEntity<GeneralResponse<CreateNewsResponse>> createNews(CreateNewsRequest request) {
         return responseFactory.response(newsService.createNews(request), ResponseStatusEnum.CREATED);
@@ -55,4 +59,11 @@ public class NewsControllerImpl implements NewsController {
                 .build();
         return responseFactory.response(newsService.getNews(request));
     }
+
+    @Override
+    public ResponseEntity<GeneralResponse<_CreateCommentResponse>> addCommentToNews(String newsId, _CreateCommentRequest request) {
+        return null;
+    }
+
+
 }
