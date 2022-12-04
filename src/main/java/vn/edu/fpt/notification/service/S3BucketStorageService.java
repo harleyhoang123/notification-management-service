@@ -14,7 +14,7 @@ import java.io.File;
  **/
 public interface S3BucketStorageService {
 
-    String uploadFile(MultipartFile file);
+    String uploadFile(String fileKey, String fileName, MultipartFile file);
 
     void downloadFile(String fileKey, HttpServletResponse response);
 

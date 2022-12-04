@@ -43,28 +43,28 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
     private String bucketAttachFile;
 
     @Override
-    public String uploadFile(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
+    public String uploadFile(String fileKey, String fileName, MultipartFile file) {
+        String fileCache = System.getProperty("java.io.tmpdir") + "/" + fileName;
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
             metadata.setContentType(getContentType(fileName));
-            File convFile = new File(fileName);
+            File convFile = new File(fileCache);
 
             try (OutputStream os = Files.newOutputStream(Path.of(convFile.getPath()))) {
                 os.write(file.getBytes());
             }
-            String fileKey = UUID.randomUUID().toString();
             PutObjectRequest request = new PutObjectRequest(bucketAttachFile, fileKey, convFile);
             request.setMetadata(metadata);
             request.setCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(request);
-            return fileKey;
+            URL url = amazonS3.getUrl(bucketAttachFile, fileKey);
+            return url.toString();
         } catch (Exception ex) {
             throw new BusinessException(ResponseStatusEnum.INTERNAL_SERVER_ERROR, "Can't put object file to AWS S3: " + ex.getMessage());
         } finally {
             try {
-                Files.delete(Paths.get(fileName));
+                Files.delete(Paths.get(fileCache));
             } catch (Exception ex) {
                 log.error("Can't delete converted file: " + ex.getMessage());
             }
