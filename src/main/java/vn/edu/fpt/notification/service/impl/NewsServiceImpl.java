@@ -111,6 +111,7 @@ public class NewsServiceImpl implements NewsService {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News ID not exist"));
         Integer currentViews = news.getViews();
+        String author = userInfoService.getUserInfo(news.getCreatedBy()).getFullName();
 
         GetNewsDetailResponse getNewsDetailResponse = GetNewsDetailResponse.builder()
                 .newsId(news.getNewsId())
@@ -118,7 +119,7 @@ public class NewsServiceImpl implements NewsService {
                 .content(news.getContent())
                 .views(news.getViews())
                 .comments(news.getComments())
-                .createdBy(news.getCreatedBy())
+                .author(author)
                 .createdDate(news.getCreatedDate())
                 .build();
         news.setViews(currentViews + 1);
