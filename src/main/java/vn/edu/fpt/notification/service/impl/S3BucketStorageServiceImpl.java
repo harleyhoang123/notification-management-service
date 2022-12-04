@@ -57,6 +57,7 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
             String fileKey = UUID.randomUUID().toString();
             PutObjectRequest request = new PutObjectRequest(bucketAttachFile, fileKey, convFile);
             request.setMetadata(metadata);
+            request.setCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(request);
             return fileKey;
         } catch (Exception ex) {
