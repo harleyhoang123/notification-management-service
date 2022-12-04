@@ -118,6 +118,8 @@ public class NewsServiceImpl implements NewsService {
                 .content(news.getContent())
                 .views(news.getViews())
                 .comments(news.getComments())
+                .createdBy(news.getCreatedBy())
+                .createdDate(news.getCreatedDate())
                 .build();
         news.setViews(currentViews + 1);
         try {
