@@ -21,8 +21,6 @@ public class _Attachment implements Serializable {
     @Id
     @Field(name = "_id", targetType = FieldType.OBJECT_ID)
     private String attachmentId;
-    @Field(name = "file_name")
-    private String fileName;
     @Field(name = "file_key")
     private String fileKey;
 }

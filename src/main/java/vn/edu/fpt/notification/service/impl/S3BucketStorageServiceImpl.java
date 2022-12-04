@@ -39,16 +39,19 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
 
     private final AmazonS3 amazonS3;
 
-    @Value("${application.bucket.attach-file}")
+    @Value("${application.bucket}")
     private String bucketAttachFile;
 
+    @Value("${application.cloudfront.bucket}")
+    private String cloudfrontBucket;
+
     @Override
-    public String uploadFile(String fileKey, String fileName, MultipartFile file) {
-        String fileCache = System.getProperty("java.io.tmpdir") + "/" + fileName;
+    public String uploadFile(MultipartFile file) {
+        String fileCache = System.getProperty("java.io.tmpdir") + "/" + file.getOriginalFilename();
+        String fileKey = UUID.randomUUID().toString();
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
-            metadata.setContentType(getContentType(fileName));
             File convFile = new File(fileCache);
 
             try (OutputStream os = Files.newOutputStream(Path.of(convFile.getPath()))) {
@@ -58,8 +61,7 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
             request.setMetadata(metadata);
             request.setCannedAcl(CannedAccessControlList.PublicRead);
             amazonS3.putObject(request);
-            URL url = amazonS3.getUrl(bucketAttachFile, fileKey);
-            return url.toString();
+            return fileKey;
         } catch (Exception ex) {
             throw new BusinessException(ResponseStatusEnum.INTERNAL_SERVER_ERROR, "Can't put object file to AWS S3: " + ex.getMessage());
         } finally {
@@ -68,22 +70,6 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
             } catch (Exception ex) {
                 log.error("Can't delete converted file: " + ex.getMessage());
             }
-        }
-    }
-
-    private String getContentType(String fileName) {
-        String fileType = fileName.split("\\.")[1];
-        switch ((fileType)) {
-            case "png":
-                return MediaType.IMAGE_PNG_VALUE;
-            case "jpeg":
-                return MediaType.IMAGE_JPEG_VALUE;
-            case "gif":
-                return MediaType.IMAGE_GIF_VALUE;
-            case "pdf":
-                return MediaType.APPLICATION_PDF_VALUE;
-            default:
-                return MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
     }
 
@@ -133,6 +119,11 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
         URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
 
+    }
+
+    @Override
+    public String getPublicURL(String fileKey) {
+        return String.format("%s/%s", cloudfrontBucket, fileKey);
     }
 
 

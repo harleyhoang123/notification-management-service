@@ -14,10 +14,12 @@ import java.io.File;
  **/
 public interface S3BucketStorageService {
 
-    String uploadFile(String fileKey, String fileName, MultipartFile file);
+    String uploadFile(MultipartFile file);
 
     void downloadFile(String fileKey, HttpServletResponse response);
 
     File downloadFile(String fileKey);
     String sharingUsingPresignedURL(String fileKey);
+
+    String getPublicURL(String fileKey);
 }

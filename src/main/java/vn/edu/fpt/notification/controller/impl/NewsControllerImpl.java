@@ -1,14 +1,20 @@
 package vn.edu.fpt.notification.controller.impl;
 
+import com.amazonaws.services.directory.model.IpRouteInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.controller.NewsController;
 import vn.edu.fpt.notification.dto.common.GeneralResponse;
+import vn.edu.fpt.notification.dto.common.PageableResponse;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
+import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.UpdateNewsRequest;
+import vn.edu.fpt.notification.dto.response.news.CreateNewsResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsDetailResponse;
+import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
 import vn.edu.fpt.notification.factory.ResponseFactory;
 import vn.edu.fpt.notification.service.NewsService;
 
@@ -20,8 +26,8 @@ public class NewsControllerImpl implements NewsController {
     private final ResponseFactory responseFactory;
     private final NewsService newsService;
     @Override
-    public ResponseEntity<GeneralResponse<Object>> createNews(CreateNewsRequest request) {
-        return null;
+    public ResponseEntity<GeneralResponse<CreateNewsResponse>> createNews(CreateNewsRequest request) {
+        return responseFactory.response(newsService.createNews(request), ResponseStatusEnum.CREATED);
     }
 
     @Override
@@ -31,11 +37,22 @@ public class NewsControllerImpl implements NewsController {
 
     @Override
     public ResponseEntity<GeneralResponse<Object>> deleteNews(String newsId) {
-        return null;
+        newsService.deleteNews(newsId);
+        return responseFactory.response(ResponseStatusEnum.SUCCESS);
     }
 
     @Override
     public ResponseEntity<GeneralResponse<GetNewsDetailResponse>> getNewsDetail(String newsId) {
-        return null;
+        return responseFactory.response(newsService.getNewsDetailResponse(newsId));
+    }
+
+    @Override
+    public ResponseEntity<GeneralResponse<PageableResponse<GetNewsResponse>>> getNews(String title, Integer page, Integer size) {
+        GetNewsRequest request = GetNewsRequest.builder()
+                .title(title)
+                .page(page)
+                .size(size)
+                .build();
+        return responseFactory.response(newsService.getNews(request));
     }
 }

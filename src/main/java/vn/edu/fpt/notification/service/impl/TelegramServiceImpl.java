@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TelegramServiceImpl implements TelegramService {
 
-    private final TelegramBotService telegramBotService;
+//    private final TelegramBotService telegramBotService;
     private final TelegramTemplateRepository telegramTemplateRepository;
     private final TelegramHistoryRepository telegramHistoryRepository;
     private final MongoTemplate mongoTemplate;
@@ -51,23 +51,23 @@ public class TelegramServiceImpl implements TelegramService {
 
 
     public void sendNotification(String templateId, SendTelegramRequest request) {
-        TelegramTemplate telegramTemplate = telegramTemplateRepository.findById(templateId)
-                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Telegram template id not exist!"));
-        String message = ParamUtils.replaceParams(telegramTemplate.getMessage(), request.getParams());
-        String status;
-        try {
-            telegramBotService.sendMessage(telegramTemplate.getChatId(), message);
-            status = AppConstant.SUCCESS;
-        } catch (Exception ex) {
-            status = AppConstant.FAILED;
-        }
-
-        telegramHistoryRepository.save(TelegramHistory.builder()
-                .template(telegramTemplate)
-                .params(request.getParams())
-                .message(message)
-                .status(status)
-                .build());
+//        TelegramTemplate telegramTemplate = telegramTemplateRepository.findById(templateId)
+//                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Telegram template id not exist!"));
+//        String message = ParamUtils.replaceParams(telegramTemplate.getMessage(), request.getParams());
+//        String status;
+//        try {
+//            telegramBotService.sendMessage(telegramTemplate.getChatId(), message);
+//            status = AppConstant.SUCCESS;
+//        } catch (Exception ex) {
+//            status = AppConstant.FAILED;
+//        }
+//
+//        telegramHistoryRepository.save(TelegramHistory.builder()
+//                .template(telegramTemplate)
+//                .params(request.getParams())
+//                .message(message)
+//                .status(status)
+//                .build());
     }
 
     @Override
