@@ -37,7 +37,8 @@ public class NewsControllerImpl implements NewsController {
 
     @Override
     public ResponseEntity<GeneralResponse<Object>> updateNews(String newsId, UpdateNewsRequest request) {
-        return null;
+        newsService.updateNews(newsId, request);
+        return responseFactory.response(ResponseStatusEnum.SUCCESS);
     }
 
     @Override

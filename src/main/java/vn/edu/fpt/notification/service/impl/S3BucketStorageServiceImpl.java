@@ -122,6 +122,17 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
     }
 
     @Override
+    public void deleteFile(String fileKey) {
+        try {
+            DeleteObjectRequest request = new DeleteObjectRequest(bucketAttachFile, fileKey);
+            amazonS3.deleteObject(request);
+        }catch (Exception ex){
+            log.error("Can't delete file key: {} in bucket: {}", fileKey, bucketAttachFile);
+            throw new BusinessException("Can't delete file in S3 bucket: "+ ex.getMessage());
+        }
+    }
+
+    @Override
     public String getPublicURL(String fileKey) {
         return String.format("%s/%s", cloudfrontBucket, fileKey);
     }

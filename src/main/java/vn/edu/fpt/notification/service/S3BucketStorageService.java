@@ -21,5 +21,7 @@ public interface S3BucketStorageService {
     File downloadFile(String fileKey);
     String sharingUsingPresignedURL(String fileKey);
 
+    void deleteFile(String fileKey);
+
     String getPublicURL(String fileKey);
 }

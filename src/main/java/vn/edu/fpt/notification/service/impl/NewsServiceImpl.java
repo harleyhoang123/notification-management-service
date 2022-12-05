@@ -48,7 +48,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public CreateNewsResponse createNews(CreateNewsRequest request) {
-        if(newsRepository.findByTitle(request.getTitle()).isPresent()){
+        if (newsRepository.findByTitle(request.getTitle()).isPresent()) {
             throw new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News title already exist");
         }
 
@@ -58,8 +58,8 @@ public class NewsServiceImpl implements NewsService {
                 .build();
         try {
             attachment = attachmentRepository.save(attachment);
-        }catch (Exception ex){
-            throw new BusinessException("Can't save attachment to database: "+ ex.getMessage());
+        } catch (Exception ex) {
+            throw new BusinessException("Can't save attachment to database: " + ex.getMessage());
         }
 
         News news = News.builder()
@@ -88,6 +88,23 @@ public class NewsServiceImpl implements NewsService {
         }
         if (Objects.nonNull(request.getContent())) {
             news.setContent(request.getContent());
+        }
+        if (Objects.nonNull(request.getThumbnail())) {
+            if (Objects.nonNull(news.getThumbnail())) {
+//                s3BucketStorageService.deleteFile(news.getThumbnail().getFileKey());
+//                log.info("Delete file in S3 success: {}", news.getThumbnail().getFileKey());
+                try {
+                    attachmentRepository.delete(news.getThumbnail());
+                    log.info("Delete attachment success");
+                }catch (Exception ex){
+                    throw new BusinessException("Can't delete attachment in database: "+ ex.getMessage());
+                }
+            }
+            String fileKey = s3BucketStorageService.uploadFile(request.getThumbnail());
+            _Attachment attachment = _Attachment.builder()
+                    .fileKey(fileKey)
+                    .build();
+            news.setThumbnail(attachment);
         }
         try {
             newsRepository.save(news);
@@ -151,7 +168,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public PageableResponse<GetNewsResponse> getNews(GetNewsRequest request) {
         Query query = new Query();
-        if(Objects.nonNull(request.getTitle())) {
+        if (Objects.nonNull(request.getTitle())) {
             query.addCriteria(Criteria.where("title").regex(request.getTitle()));
         }
         query.with(Sort.by(Sort.Direction.DESC, "created_date"));
