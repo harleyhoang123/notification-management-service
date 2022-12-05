@@ -78,7 +78,8 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
 
     @Override
     public String uploadFile(CreateFileRequest request) {
-        byte[] decodedFile = Base64.getDecoder().decode(request.getBase64().getBytes(StandardCharsets.UTF_8));
+        String base64 = request.getBase64().split(",")[1];
+        byte[] decodedFile = Base64.getDecoder().decode(base64.getBytes(StandardCharsets.UTF_8));
         String fileKey = UUID.randomUUID().toString();
         InputStream is = new ByteArrayInputStream(decodedFile);
         ObjectMetadata metadata = new ObjectMetadata();
@@ -86,6 +87,7 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
         metadata.setContentLength(request.getSize());
 
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketAttachFile, fileKey, is, metadata);
+        putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
         try {
             amazonS3.putObject(putObjectRequest);
         }catch (Exception ex){
