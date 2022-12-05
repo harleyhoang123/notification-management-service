@@ -11,17 +11,20 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
+import vn.edu.fpt.notification.dto.request.comment.CreateFileRequest;
 import vn.edu.fpt.notification.exception.BusinessException;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -71,6 +74,24 @@ public class S3BucketStorageServiceImpl implements S3BucketStorageService {
                 log.error("Can't delete converted file: " + ex.getMessage());
             }
         }
+    }
+
+    @Override
+    public String uploadFile(CreateFileRequest request) {
+        byte[] decodedFile = Base64.getDecoder().decode(request.getBase64().getBytes(StandardCharsets.UTF_8));
+        String fileKey = UUID.randomUUID().toString();
+        InputStream is = new ByteArrayInputStream(decodedFile);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(request.getMimeType());
+        metadata.setContentLength(request.getSize());
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketAttachFile, fileKey, is, metadata);
+        try {
+            amazonS3.putObject(putObjectRequest);
+        }catch (Exception ex){
+            throw new BusinessException("Can't push object to s3 bucket: "+ ex.getMessage());
+        }
+        return fileKey;
     }
 
     @Override

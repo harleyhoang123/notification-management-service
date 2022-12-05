@@ -29,6 +29,9 @@ import vn.edu.fpt.notification.service.NewsService;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
 import vn.edu.fpt.notification.service.UserInfoService;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -51,7 +54,6 @@ public class NewsServiceImpl implements NewsService {
         if (newsRepository.findByTitle(request.getTitle()).isPresent()) {
             throw new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News title already exist");
         }
-
         String fileKey = s3BucketStorageService.uploadFile(request.getThumbnail());
         _Attachment attachment = _Attachment.builder()
                 .fileKey(fileKey)

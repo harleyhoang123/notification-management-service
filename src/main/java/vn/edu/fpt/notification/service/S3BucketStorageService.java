@@ -1,6 +1,7 @@
 package vn.edu.fpt.notification.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import vn.edu.fpt.notification.dto.request.comment.CreateFileRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -15,6 +16,8 @@ import java.io.File;
 public interface S3BucketStorageService {
 
     String uploadFile(MultipartFile file);
+
+    String uploadFile(CreateFileRequest request);
 
     void downloadFile(String fileKey, HttpServletResponse response);
 

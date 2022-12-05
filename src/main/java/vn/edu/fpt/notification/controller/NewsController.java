@@ -16,8 +16,8 @@ import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
 @RequestMapping("${app.application-context}/public/api/v1/news")
 public interface NewsController {
 
-    @PostMapping(value = "/news", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    ResponseEntity<GeneralResponse<CreateNewsResponse>> createNews(@ModelAttribute CreateNewsRequest request);
+    @PostMapping(value = "/news")
+    ResponseEntity<GeneralResponse<CreateNewsResponse>> createNews(@RequestBody CreateNewsRequest request);
     @PutMapping(value = "/{news-id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<GeneralResponse<Object>> updateNews(@PathVariable("news-id") String newsId, @ModelAttribute UpdateNewsRequest request);
     @DeleteMapping("/{news-id}")
