@@ -31,6 +31,7 @@ import vn.edu.fpt.notification.repository.EmailHistoryRepository;
 import vn.edu.fpt.notification.repository.EmailTemplateRepository;
 import vn.edu.fpt.notification.service.EmailService;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
+import vn.edu.fpt.notification.service.UserInfoService;
 import vn.edu.fpt.notification.utils.ParamUtils;
 
 import javax.mail.MessagingException;
@@ -55,7 +56,7 @@ public class EmailServiceImpl implements EmailService {
     private final EmailHistoryRepository emailHistoryRepository;
     private final JavaMailSender javaMailSender;
     private final ObjectMapper objectMapper;
-
+    private final UserInfoService userInfoService;
     private final S3BucketStorageService s3BucketStorageService;
     private final MongoTemplate mongoTemplate;
 
@@ -140,7 +141,7 @@ public class EmailServiceImpl implements EmailService {
                     .build();
             this.sendEmail(sendEmailEvent.getTemplateId(), request);
         } catch (JsonProcessingException ex) {
-            throw new BusinessException(ResponseStatusEnum.INTERNAL_SERVER_ERROR, "Can't convert value from flab.send_email topics: "+ex.getMessage());
+            throw new BusinessException(ResponseStatusEnum.INTERNAL_SERVER_ERROR, "Can't convert value from flab.send_email topics: " + ex.getMessage());
         }
     }
 
@@ -153,7 +154,7 @@ public class EmailServiceImpl implements EmailService {
         List<AttachFile> attachFiles = new ArrayList<>();
 
         MultipartFile[] files = request.getAttachFile();
-        if(Objects.nonNull(files)) {
+        if (Objects.nonNull(files)) {
             for (int i = 0; i < files.length; i++) {
                 attachFiles.add(new AttachFile(files[i].getOriginalFilename(), s3BucketStorageService.uploadFile(files[i])));
             }
@@ -305,9 +306,9 @@ public class EmailServiceImpl implements EmailService {
                 .subject(emailTemplate.getSubject())
                 .message(emailTemplate.getMessage())
                 .params(emailTemplate.getParams())
-                .createdBy(emailTemplate.getCreatedBy())
+                .createdBy(userInfoService.getUserInfo(emailTemplate.getCreatedBy()))
                 .createdDate(emailTemplate.getCreatedDate())
-                .lastModifiedBy(emailTemplate.getLastModifiedBy())
+                .lastModifiedBy(userInfoService.getUserInfo(emailTemplate.getLastModifiedBy()))
                 .lastModifiedDate(emailTemplate.getLastModifiedDate())
                 .build();
     }

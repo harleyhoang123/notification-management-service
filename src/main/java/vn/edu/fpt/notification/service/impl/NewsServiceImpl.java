@@ -13,9 +13,12 @@ import vn.edu.fpt.notification.dto.common.PageableResponse;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.UpdateNewsRequest;
+import vn.edu.fpt.notification.dto.response.comment.GetCommentDetailResponse;
 import vn.edu.fpt.notification.dto.response.news.CreateNewsResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsDetailResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
+import vn.edu.fpt.notification.dto.response.news._GetAttachmentResponse;
+import vn.edu.fpt.notification.entity.Comment;
 import vn.edu.fpt.notification.entity.News;
 import vn.edu.fpt.notification.entity._Attachment;
 import vn.edu.fpt.notification.exception.BusinessException;
@@ -99,7 +102,7 @@ public class NewsServiceImpl implements NewsService {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News ID not exist"));
         try {
-            newsRepository.deleteById(newsId);
+            newsRepository.delete(news);
             log.info("Delete news success");
         } catch (Exception ex) {
             throw new BusinessException("Can't delete news to database: " + ex.getMessage());
@@ -111,16 +114,18 @@ public class NewsServiceImpl implements NewsService {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News ID not exist"));
         Integer currentViews = news.getViews();
-        String author = userInfoService.getUserInfo(news.getCreatedBy()).getFullName();
+        List<GetCommentDetailResponse> commentDetailResponses = news.getComments().stream().map(this::convertCommentToGetCommentResponse).collect(Collectors.toList());
 
         GetNewsDetailResponse getNewsDetailResponse = GetNewsDetailResponse.builder()
                 .newsId(news.getNewsId())
                 .title(news.getTitle())
                 .content(news.getContent())
                 .views(news.getViews())
-                .comments(news.getComments())
-                .author(author)
+                .comments(commentDetailResponses)
+                .createdBy(userInfoService.getUserInfo(news.getCreatedBy()))
                 .createdDate(news.getCreatedDate())
+                .lastModifiedBy(userInfoService.getUserInfo(news.getLastModifiedBy()))
+                .lastModifiedDate(news.getLastModifiedDate())
                 .build();
         news.setViews(currentViews + 1);
         try {
@@ -130,6 +135,17 @@ public class NewsServiceImpl implements NewsService {
             throw new BusinessException("Can't increase views of news in database: " + ex.getMessage());
         }
         return getNewsDetailResponse;
+    }
+
+    private GetCommentDetailResponse convertCommentToGetCommentResponse(Comment comment) {
+        return GetCommentDetailResponse.builder()
+                .commentId(comment.getCommentId())
+                .content(comment.getContent())
+                .createdBy(userInfoService.getUserInfo(comment.getCreatedBy()))
+                .createdDate(comment.getCreatedDate())
+                .lastModifiedBy(userInfoService.getUserInfo(comment.getLastModifiedBy()))
+                .lastModifiedDate(comment.getLastModifiedDate())
+                .build();
     }
 
     @Override
@@ -152,12 +168,14 @@ public class NewsServiceImpl implements NewsService {
 
     private GetNewsResponse convertNewsToGetNewsResponse(News news) {
         UserInfo userInfo = userInfoService.getUserInfo(news.getCreatedBy());
-        String thumbnailURL = news.getThumbnail() == null ? null : s3BucketStorageService.getPublicURL(news.getThumbnail().getFileKey());
         return GetNewsResponse.builder()
                 .newsId(news.getNewsId())
                 .title(news.getTitle())
                 .author(userInfo == null ? null : userInfo.getFullName())
-                .thumbnail(thumbnailURL)
+                .thumbnail(_GetAttachmentResponse.builder()
+                        .attachmentId(news.getThumbnail().getAttachmentId())
+                        .URL(s3BucketStorageService.getPublicURL(news.getThumbnail().getFileKey()))
+                        .build())
                 .createdDate(news.getCreatedDate())
                 .views(news.getViews())
                 .comments(news.getComments().size())

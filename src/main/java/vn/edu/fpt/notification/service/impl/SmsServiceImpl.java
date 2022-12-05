@@ -28,6 +28,7 @@ import vn.edu.fpt.notification.repository.BaseMongoRepository;
 import vn.edu.fpt.notification.repository.SmsHistoryRepository;
 import vn.edu.fpt.notification.repository.SmsTemplateRepository;
 import vn.edu.fpt.notification.service.SmsService;
+import vn.edu.fpt.notification.service.UserInfoService;
 import vn.edu.fpt.notification.utils.ParamUtils;
 
 import java.util.List;
@@ -50,6 +51,7 @@ public class SmsServiceImpl implements SmsService {
     private final SmsHistoryRepository smsHistoryRepository;
     private final MongoTemplate mongoTemplate;
     private final ObjectMapper objectMapper;
+    private final UserInfoService userInfoService;
 
     @Value("${app.sms.service-sid}")
     private String notificationServiceSid;
@@ -195,9 +197,9 @@ public class SmsServiceImpl implements SmsService {
                 .templateName(smsTemplate.getTemplateName())
                 .message(smsTemplate.getMessage())
                 .params(smsTemplate.getParams())
-                .createdBy(smsTemplate.getCreatedBy())
+                .createdBy(userInfoService.getUserInfo(smsTemplate.getCreatedBy()))
                 .createdDate(smsTemplate.getCreatedDate())
-                .lastModifiedBy(smsTemplate.getLastModifiedBy())
+                .lastModifiedBy(userInfoService.getUserInfo(smsTemplate.getLastModifiedBy()))
                 .lastModifiedDate(smsTemplate.getLastModifiedDate())
                 .build();
     }

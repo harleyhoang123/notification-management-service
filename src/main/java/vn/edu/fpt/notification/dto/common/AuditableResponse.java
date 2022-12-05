@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import vn.edu.fpt.notification.dto.cache.UserInfo;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -23,8 +24,8 @@ import java.time.LocalDateTime;
 public abstract class AuditableResponse implements Serializable {
 
     private static final long serialVersionUID = -8406677523279755332L;
-    protected String createdBy;
+    protected UserInfo createdBy;
     protected LocalDateTime createdDate;
-    protected String lastModifiedBy;
+    protected UserInfo lastModifiedBy;
     protected LocalDateTime lastModifiedDate;
 }

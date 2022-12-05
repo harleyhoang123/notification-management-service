@@ -1,5 +1,6 @@
 package vn.edu.fpt.notification.dto.response.news;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,13 +20,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
+@JsonPropertyOrder({"newsId", "title", "author", "thumbnail", "createdDate", "views", "comments"})
 public class GetNewsResponse implements Serializable {
 
     private static final long serialVersionUID = 873530419794713812L;
     private String newsId;
     private String title;
     private String author;
-    private String thumbnail;
+    private _GetAttachmentResponse thumbnail;
     private LocalDateTime createdDate;
     private Integer views;
     private Integer comments;

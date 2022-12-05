@@ -15,6 +15,7 @@ import vn.edu.fpt.notification.repository.NewsRepository;
 import vn.edu.fpt.notification.service.CommentService;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : Hoang Lam
@@ -60,12 +61,31 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void updateComment(String newsId, _UpdateCommentRequest request) {
+    public void updateComment(String commentId, _UpdateCommentRequest request) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
+
+        if (Objects.nonNull(request.getContent())){
+            comment.setContent(request.getContent());
+            try {
+                commentRepository.save(comment);
+                log.info("Update comment success");
+            }catch (Exception ex){
+                throw new BusinessException("Can't update comment in database: "+ ex.getMessage());
+            }
+        }
 
     }
 
     @Override
     public void deleteComment(String commentId) {
+        commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
 
+        try {
+            commentRepository.deleteById(commentId);
+            log.info("Delete comment success");
+        }catch (Exception ex){
+            throw new BusinessException("Can't delete comment in database: "+ ex.getMessage());
+        }
     }
 }

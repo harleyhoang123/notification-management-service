@@ -1,11 +1,10 @@
 package vn.edu.fpt.notification.dto.response.news;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import vn.edu.fpt.notification.dto.common.AuditableResponse;
+import vn.edu.fpt.notification.dto.response.comment.GetCommentDetailResponse;
 import vn.edu.fpt.notification.entity.Comment;
 import vn.edu.fpt.notification.entity._Attachment;
 
@@ -14,16 +13,17 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @SuperBuilder
+@JsonPropertyOrder({"newsId", "title", "content", "comments", "views"})
 public class GetNewsDetailResponse extends AuditableResponse implements Serializable {
 
     private static final long serialVersionUID = 8651582105311396196L;
     private String newsId;
     private String title;
-    private String author;
     private String content;
-    private _Attachment thumbnail;
-    private List<Comment> comments;
+    private List<GetCommentDetailResponse> comments;
     private Integer views;
 }

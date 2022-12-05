@@ -1,6 +1,5 @@
 package vn.edu.fpt.notification.controller.impl;
 
-import com.amazonaws.services.directory.model.IpRouteInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import vn.edu.fpt.notification.dto.response.news.CreateNewsResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsDetailResponse;
 import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
 import vn.edu.fpt.notification.factory.ResponseFactory;
+import vn.edu.fpt.notification.service.CommentService;
 import vn.edu.fpt.notification.service.NewsService;
 
 @RestController
@@ -27,6 +27,7 @@ public class NewsControllerImpl implements NewsController {
 
     private final ResponseFactory responseFactory;
     private final NewsService newsService;
+    private final CommentService commentService;
 
 
     @Override
@@ -62,7 +63,7 @@ public class NewsControllerImpl implements NewsController {
 
     @Override
     public ResponseEntity<GeneralResponse<_CreateCommentResponse>> addCommentToNews(String newsId, _CreateCommentRequest request) {
-        return null;
+        return responseFactory.response(commentService.addCommentToNews(newsId, request));
     }
 
 

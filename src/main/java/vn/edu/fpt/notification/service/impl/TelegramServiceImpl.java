@@ -25,6 +25,7 @@ import vn.edu.fpt.notification.repository.BaseMongoRepository;
 import vn.edu.fpt.notification.repository.TelegramHistoryRepository;
 import vn.edu.fpt.notification.repository.TelegramTemplateRepository;
 import vn.edu.fpt.notification.service.TelegramService;
+import vn.edu.fpt.notification.service.UserInfoService;
 import vn.edu.fpt.notification.utils.ParamUtils;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class TelegramServiceImpl implements TelegramService {
 
 //    private final TelegramBotService telegramBotService;
     private final TelegramTemplateRepository telegramTemplateRepository;
+    private final UserInfoService userInfoService;
     private final TelegramHistoryRepository telegramHistoryRepository;
     private final MongoTemplate mongoTemplate;
     private final ObjectMapper objectMapper;
@@ -174,9 +176,9 @@ public class TelegramServiceImpl implements TelegramService {
                 .channelId(telegramTemplate.getChatId())
                 .message(telegramTemplate.getMessage())
                 .params(telegramTemplate.getParams())
-                .createdBy(telegramTemplate.getCreatedBy())
+                .createdBy(userInfoService.getUserInfo(telegramTemplate.getCreatedBy()))
                 .createdDate(telegramTemplate.getCreatedDate())
-                .lastModifiedBy(telegramTemplate.getLastModifiedBy())
+                .lastModifiedBy(userInfoService.getUserInfo(telegramTemplate.getLastModifiedBy()))
                 .lastModifiedDate(telegramTemplate.getLastModifiedDate())
                 .build();
     }

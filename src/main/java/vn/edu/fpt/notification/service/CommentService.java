@@ -15,7 +15,7 @@ public interface CommentService {
 
     _CreateCommentResponse addCommentToNews(String newsId, _CreateCommentRequest request);
 
-    void updateComment(String newsId, _UpdateCommentRequest request);
+    void updateComment(String commentId, _UpdateCommentRequest request);
 
     void deleteComment(String commentId);
 }
