@@ -18,8 +18,8 @@ public interface NewsController {
 
     @PostMapping(value = "/news")
     ResponseEntity<GeneralResponse<CreateNewsResponse>> createNews(@RequestBody CreateNewsRequest request);
-    @PutMapping(value = "/{news-id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    ResponseEntity<GeneralResponse<Object>> updateNews(@PathVariable("news-id") String newsId, @ModelAttribute UpdateNewsRequest request);
+    @PutMapping(value = "/{news-id}")
+    ResponseEntity<GeneralResponse<Object>> updateNews(@PathVariable("news-id") String newsId, @RequestBody UpdateNewsRequest request);
     @DeleteMapping("/{news-id}")
     ResponseEntity<GeneralResponse<Object>> deleteNews(@PathVariable(name = "news-id") String newsId);
     @GetMapping("/{news-id}")
