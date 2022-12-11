@@ -26,6 +26,7 @@ import vn.edu.fpt.notification.repository.AttachmentRepository;
 import vn.edu.fpt.notification.repository.BaseMongoRepository;
 import vn.edu.fpt.notification.repository.CommentRepository;
 import vn.edu.fpt.notification.repository.NewsRepository;
+import vn.edu.fpt.notification.service.CommentService;
 import vn.edu.fpt.notification.service.NewsService;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
 import vn.edu.fpt.notification.service.UserInfoService;
@@ -49,7 +50,7 @@ public class NewsServiceImpl implements NewsService {
     private final UserInfoService userInfoService;
     private final MongoTemplate mongoTemplate;
     private final CommentRepository commentRepository;
-
+    private final CommentService commentService;
 
     @Override
     public CreateNewsResponse createNews(CreateNewsRequest request) {
@@ -127,6 +128,13 @@ public class NewsServiceImpl implements NewsService {
     public void deleteNews(String newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News ID not exist"));
+        List<Comment> comments = news.getComments();
+        if (!comments.isEmpty()) {
+            for (Comment c: comments) {
+                this.deleteCommentFromNews(newsId, c.getCommentId());
+            }
+        }
+
         try {
             newsRepository.delete(news);
             log.info("Delete news success");
@@ -201,6 +209,12 @@ public class NewsServiceImpl implements NewsService {
         List<Comment> list = news.getComments();
         list.removeIf(v-> v.getCommentId().equals(commentId));
         news.setComments(list);
+        List<Comment> subComments = comment.getComments();
+        if (!subComments.isEmpty()){
+            for (Comment c: subComments) {
+                commentService.deleteSubCommentFromComment(commentId, c.getCommentId());
+            }
+        }
         try{
             commentRepository.delete(comment);
             log.info("Delete comment from comment success");

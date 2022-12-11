@@ -35,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public _CreateCommentResponse addCommentToNews(String newsId, _CreateCommentRequest request) {
         News news = newsRepository.findById(newsId)
-                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, ""));
+                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News ID not exist"));
 
         Comment comment = Comment.builder()
                 .content(request.getContent())
@@ -61,6 +61,34 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public _CreateCommentResponse addCommentToComment(String commentId, _CreateCommentRequest request) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
+
+        Comment subComment = Comment.builder()
+                .content(request.getContent())
+                .build();
+        try {
+            subComment = commentRepository.save(subComment);
+        }catch (Exception ex){
+            throw new BusinessException("Can't save sub comment to database: "+ ex.getMessage());
+        }
+
+        List<Comment> subComments = comment.getComments();
+        subComments.add(subComment);
+        comment.setComments(subComments);
+        try {
+            commentRepository.save(comment);
+        }catch (Exception ex){
+            throw new BusinessException("Can't update sub comment to comment to database");
+        }
+
+        return _CreateCommentResponse.builder()
+                .commentId(subComment.getCommentId())
+                .build();
+    }
+
+    @Override
     public void updateComment(String commentId, _UpdateCommentRequest request) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
@@ -78,14 +106,31 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(String commentId) {
-        commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
+    public void deleteSubCommentFromComment(String commentId, String subCommentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
+        Comment subComment = commentRepository.findById(subCommentId).orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Sub Comment ID not exist"));
+        List<Comment> comments = comment.getComments();
+        comments.removeIf(m->m.getCommentId().equals(subCommentId));
+        comment.setComments(comments);
+        List<Comment> subComments = subComment.getComments();
+        if (!subComments.isEmpty()){
+            for (Comment c: subComments) {
+                this.deleteSubCommentFromComment(subCommentId, c.getCommentId());
+            }
+        }
 
         try {
-            commentRepository.deleteById(commentId);
-            log.info("Delete comment success");
+            commentRepository.deleteById(subCommentId);
+            log.info("Delete sub comment success");
         }catch (Exception ex){
-            throw new BusinessException("Can't delete comment in database: "+ ex.getMessage());
+            throw new BusinessException("Can't delete sub comment in database: "+ ex.getMessage());
+        }
+        try {
+            commentRepository.save(comment);
+            log.info("Save comment success");
+        }catch (Exception ex){
+            throw new BusinessException("Can't save comment in database: "+ ex.getMessage());
         }
     }
+
 }

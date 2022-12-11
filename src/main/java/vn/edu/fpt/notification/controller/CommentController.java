@@ -3,7 +3,9 @@ package vn.edu.fpt.notification.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.fpt.notification.dto.common.GeneralResponse;
+import vn.edu.fpt.notification.dto.request.comment._CreateCommentRequest;
 import vn.edu.fpt.notification.dto.request.comment._UpdateCommentRequest;
+import vn.edu.fpt.notification.dto.response.comment._CreateCommentResponse;
 
 /**
  * @author : Hoang Lam
@@ -16,9 +18,15 @@ import vn.edu.fpt.notification.dto.request.comment._UpdateCommentRequest;
 @RequestMapping("${app.application-context}/public/api/v1/comments")
 public interface CommentController {
 
+    @PostMapping("/{comment-id}/comment")
+    ResponseEntity<GeneralResponse<_CreateCommentResponse>> addCommentToNews(@PathVariable("comment-id") String commentId, @RequestBody _CreateCommentRequest request);
+
     @PutMapping("/{comment-id}")
     ResponseEntity<GeneralResponse<Object>> updateComment(@PathVariable("comment-id") String commentId, @RequestBody _UpdateCommentRequest request);
 
     @DeleteMapping("/{comment-id}")
-    ResponseEntity<GeneralResponse<Object>> deleteComment(@PathVariable("comment-id") String commentId);
+    ResponseEntity<GeneralResponse<Object>> deleteSubCommentFromComment(@PathVariable("comment-id") String commentId, @PathVariable("subcomment-id") String subCommentId);
+
 }
+
+
