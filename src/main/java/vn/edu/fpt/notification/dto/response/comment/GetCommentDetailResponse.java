@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import vn.edu.fpt.notification.dto.common.AuditableResponse;
+import vn.edu.fpt.notification.entity.Comment;
+
+import java.util.List;
 
 /**
  * @author : Hoang Lam
@@ -24,4 +27,5 @@ public class GetCommentDetailResponse extends AuditableResponse {
     private static final long serialVersionUID = -5838501817641283869L;
     private String commentId;
     private String content;
+    private List<Comment> comments;
 }
