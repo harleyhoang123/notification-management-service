@@ -106,6 +106,11 @@ public class NewsServiceImpl implements NewsService {
             _Attachment attachment = _Attachment.builder()
                     .fileKey(fileKey)
                     .build();
+            try {
+                attachment = attachmentRepository.save(attachment);
+            }catch (Exception ex){
+                throw new BusinessException("Can't save attachment to database"+ ex.getMessage());
+            }
             news.setThumbnail(attachment);
         }
         try {

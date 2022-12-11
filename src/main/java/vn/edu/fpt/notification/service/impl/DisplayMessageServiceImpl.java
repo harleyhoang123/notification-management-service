@@ -26,6 +26,7 @@ import vn.edu.fpt.notification.mapper.DisplayMessageMapper;
 import vn.edu.fpt.notification.repository.BaseMongoRepository;
 import vn.edu.fpt.notification.repository.DisplayMessageRepository;
 import vn.edu.fpt.notification.service.DisplayMessageService;
+import vn.edu.fpt.notification.service.UserInfoService;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,9 +48,9 @@ public class DisplayMessageServiceImpl implements DisplayMessageService {
 
     private final DisplayMessageRepository displayMessageRepository;
     private final MongoTemplate mongoTemplate;
-    private final DisplayMessageMapper displayMessageMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final UserInfoService userInfoService;
 
     @Override
     @Cacheable
@@ -176,12 +177,24 @@ public class DisplayMessageServiceImpl implements DisplayMessageService {
         BaseMongoRepository.addCriteriaWithSorted(query, request);
         try{
             List<DisplayMessage> displayMessages = mongoTemplate.find(query, DisplayMessage.class);
-            List<GetDisplayMessageResponse> displayMessageResponses = displayMessages.stream().map(displayMessageMapper::mapToGetDisplayMessageResponse).collect(Collectors.toList());
+            List<GetDisplayMessageResponse> displayMessageResponses = displayMessages.stream().map(this::mapToGetDisplayMessageResponse).collect(Collectors.toList());
             return new PageableResponse<>(request, totalElements, displayMessageResponses);
         }catch (Exception ex){
             throw new BusinessException(ResponseStatusEnum.INTERNAL_SERVER_ERROR, "Can't find display message in db: "+ ex.getMessage());
         }
 
+    }
+
+    private GetDisplayMessageResponse mapToGetDisplayMessageResponse(DisplayMessage displayMessage) {
+       return GetDisplayMessageResponse.builder()
+               .displayMessageId(displayMessage.getDisplayMessageId())
+               .message(displayMessage.getMessage())
+               .code(displayMessage.getCode())
+               .createdBy(userInfoService.getUserInfo(displayMessage.getCreatedBy()))
+               .createdDate(displayMessage.getCreatedDate())
+               .lastModifiedBy(userInfoService.getUserInfo(displayMessage.getLastModifiedBy()))
+               .lastModifiedDate(displayMessage.getLastModifiedDate())
+                .build();
     }
 
 }
