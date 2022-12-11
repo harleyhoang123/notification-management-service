@@ -175,6 +175,7 @@ public class NewsServiceImpl implements NewsService {
         return GetCommentDetailResponse.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.getContent())
+                .comments(comment.getComments())
                 .createdBy(userInfoService.getUserInfo(comment.getCreatedBy()))
                 .createdDate(comment.getCreatedDate())
                 .lastModifiedBy(userInfoService.getUserInfo(comment.getLastModifiedBy()))

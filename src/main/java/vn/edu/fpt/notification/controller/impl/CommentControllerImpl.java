@@ -8,6 +8,7 @@ import vn.edu.fpt.notification.controller.CommentController;
 import vn.edu.fpt.notification.dto.common.GeneralResponse;
 import vn.edu.fpt.notification.dto.request.comment._CreateCommentRequest;
 import vn.edu.fpt.notification.dto.request.comment._UpdateCommentRequest;
+import vn.edu.fpt.notification.dto.response.comment.GetCommentDetailResponse;
 import vn.edu.fpt.notification.dto.response.comment._CreateCommentResponse;
 import vn.edu.fpt.notification.factory.ResponseFactory;
 import vn.edu.fpt.notification.service.CommentService;
@@ -44,4 +45,8 @@ public class CommentControllerImpl implements CommentController {
         return responseFactory.response(ResponseStatusEnum.SUCCESS);
     }
 
+    @Override
+    public ResponseEntity<GeneralResponse<GetCommentDetailResponse>> getCommentDetail(String commentId) {
+        return null;
+    }
 }

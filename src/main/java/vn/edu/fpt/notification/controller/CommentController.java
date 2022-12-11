@@ -24,7 +24,7 @@ public interface CommentController {
     @PutMapping("/{comment-id}")
     ResponseEntity<GeneralResponse<Object>> updateComment(@PathVariable("comment-id") String commentId, @RequestBody _UpdateCommentRequest request);
 
-    @DeleteMapping("/{comment-id}")
+    @DeleteMapping("/{comment-id}/{subcomment-id}")
     ResponseEntity<GeneralResponse<Object>> deleteSubCommentFromComment(@PathVariable("comment-id") String commentId, @PathVariable("subcomment-id") String subCommentId);
 
 }
