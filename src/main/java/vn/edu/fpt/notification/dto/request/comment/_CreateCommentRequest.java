@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Data
 @Builder
 public class _CreateCommentRequest implements Serializable {
-
     private static final long serialVersionUID = -8167438879102905215L;
     private String content;
+
 }

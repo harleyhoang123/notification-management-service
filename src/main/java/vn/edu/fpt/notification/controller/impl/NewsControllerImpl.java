@@ -67,5 +67,10 @@ public class NewsControllerImpl implements NewsController {
         return responseFactory.response(commentService.addCommentToNews(newsId, request));
     }
 
+    @Override
+    public ResponseEntity<GeneralResponse<Object>> deleteCommentToNews(String newsId, String commentId) {
+        return responseFactory.response(newsService.deleteCommentToNews(newsId, commentId));
+    }
+
 
 }

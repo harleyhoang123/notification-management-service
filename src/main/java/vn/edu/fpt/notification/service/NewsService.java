@@ -1,5 +1,6 @@
 package vn.edu.fpt.notification.service;
 
+import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
@@ -19,4 +20,6 @@ public interface NewsService {
     GetNewsDetailResponse getNewsDetailResponse(String newsId);
 
     PageableResponse<GetNewsResponse> getNews(GetNewsRequest request);
+
+    ResponseStatusEnum deleteCommentToNews(String newsId, String commentId);
 }

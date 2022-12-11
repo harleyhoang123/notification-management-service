@@ -19,7 +19,6 @@ import java.io.Serializable;
 @Data
 @Builder
 public class _UpdateCommentRequest implements Serializable {
-
     private static final long serialVersionUID = 4147799146530553848L;
     private String content;
 }
