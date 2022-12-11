@@ -24,6 +24,7 @@ import vn.edu.fpt.notification.entity._Attachment;
 import vn.edu.fpt.notification.exception.BusinessException;
 import vn.edu.fpt.notification.repository.AttachmentRepository;
 import vn.edu.fpt.notification.repository.BaseMongoRepository;
+import vn.edu.fpt.notification.repository.CommentRepository;
 import vn.edu.fpt.notification.repository.NewsRepository;
 import vn.edu.fpt.notification.service.NewsService;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
@@ -47,6 +48,7 @@ public class NewsServiceImpl implements NewsService {
     private final AttachmentRepository attachmentRepository;
     private final UserInfoService userInfoService;
     private final MongoTemplate mongoTemplate;
+    private final CommentRepository commentRepository;
 
 
     @Override
@@ -188,6 +190,29 @@ public class NewsServiceImpl implements NewsService {
 
         List<GetNewsResponse> getNewsResponses = news.stream().map(this::convertNewsToGetNewsResponse).collect(Collectors.toList());
         return new PageableResponse<>(request, totalElements, getNewsResponses);
+    }
+
+    @Override
+    public void deleteCommentFromNews(String newsId, String commentId) {
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "News ID not exist"));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Comment ID not exist"));
+        List<Comment> list = news.getComments();
+        list.removeIf(v-> v.getCommentId().equals(commentId));
+        news.setComments(list);
+        try{
+            commentRepository.delete(comment);
+            log.info("Delete comment from comment success");
+        } catch (Exception ex){
+            throw new BusinessException("Can't delete comment from comment to database" + ex.getMessage());
+        }
+        try {
+            newsRepository.save(news);
+            log.info("save new success");
+        } catch (Exception ex) {
+            throw new BusinessException("Can't save new to database: " + ex.getMessage());
+        }
     }
 
     private GetNewsResponse convertNewsToGetNewsResponse(News news) {

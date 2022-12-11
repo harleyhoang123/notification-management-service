@@ -34,6 +34,6 @@ public interface NewsController {
 
     @PostMapping("/{news-id}/comment")
     ResponseEntity<GeneralResponse<_CreateCommentResponse>> addCommentToNews(@PathVariable("news-id") String newsId, @RequestBody _CreateCommentRequest request);
-    @DeleteMapping("/{news-id}/comment")
-    ResponseEntity<GeneralResponse<Object>> deleteCommentToNews(String newsId, String commentId);
+    @DeleteMapping("/{news-id}/{comment-id}")
+    ResponseEntity<GeneralResponse<Object>> deleteCommentFromNews(@PathVariable(name = "news-id") String newsId, @PathVariable(name = "comment-id") String commentId);
 }

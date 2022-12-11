@@ -21,5 +21,5 @@ public interface NewsService {
 
     PageableResponse<GetNewsResponse> getNews(GetNewsRequest request);
 
-    ResponseStatusEnum deleteCommentToNews(String newsId, String commentId);
+    void deleteCommentFromNews(String newsId, String commentId);
 }

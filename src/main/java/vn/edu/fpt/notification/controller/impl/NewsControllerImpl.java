@@ -68,9 +68,9 @@ public class NewsControllerImpl implements NewsController {
     }
 
     @Override
-    public ResponseEntity<GeneralResponse<Object>> deleteCommentToNews(String newsId, String commentId) {
-        return responseFactory.response(newsService.deleteCommentToNews(newsId, commentId));
+    public ResponseEntity<GeneralResponse<Object>> deleteCommentFromNews(String newsId, String commentId) {
+        newsService.deleteCommentFromNews(newsId, commentId);
+        return responseFactory.response(ResponseStatusEnum.SUCCESS);
     }
-
 
 }
