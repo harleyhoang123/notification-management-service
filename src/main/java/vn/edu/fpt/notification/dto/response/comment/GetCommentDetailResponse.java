@@ -27,5 +27,5 @@ public class GetCommentDetailResponse extends AuditableResponse {
     private static final long serialVersionUID = -5838501817641283869L;
     private String commentId;
     private String content;
-    private List<Comment> comments;
+    private List<GetCommentDetailResponse> comments;
 }

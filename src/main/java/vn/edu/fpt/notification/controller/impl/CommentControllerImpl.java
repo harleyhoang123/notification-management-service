@@ -44,9 +44,4 @@ public class CommentControllerImpl implements CommentController {
         commentService.deleteSubCommentFromComment(commentId, subCommentId);
         return responseFactory.response(ResponseStatusEnum.SUCCESS);
     }
-
-    @Override
-    public ResponseEntity<GeneralResponse<GetCommentDetailResponse>> getCommentDetail(String commentId) {
-        return null;
-    }
 }

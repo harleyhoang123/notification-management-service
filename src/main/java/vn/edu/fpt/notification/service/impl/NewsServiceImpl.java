@@ -33,10 +33,7 @@ import vn.edu.fpt.notification.service.UserInfoService;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -172,10 +169,17 @@ public class NewsServiceImpl implements NewsService {
     }
 
     private GetCommentDetailResponse convertCommentToGetCommentResponse(Comment comment) {
+        List<Comment> comments = comment.getComments();
+        List<GetCommentDetailResponse> getCommentDetailResponses;
+        if (!comments.isEmpty()) {
+            getCommentDetailResponses = comments.stream().map(this::convertCommentToGetCommentResponse).collect(Collectors.toList());
+        } else {
+            getCommentDetailResponses = new ArrayList<>();
+        }
         return GetCommentDetailResponse.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.getContent())
-                .comments(comment.getComments())
+                .comments(getCommentDetailResponses)
                 .createdBy(userInfoService.getUserInfo(comment.getCreatedBy()))
                 .createdDate(comment.getCreatedDate())
                 .lastModifiedBy(userInfoService.getUserInfo(comment.getLastModifiedBy()))
