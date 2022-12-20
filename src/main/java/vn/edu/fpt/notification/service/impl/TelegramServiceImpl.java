@@ -25,6 +25,7 @@ import vn.edu.fpt.notification.repository.BaseMongoRepository;
 import vn.edu.fpt.notification.repository.TelegramHistoryRepository;
 import vn.edu.fpt.notification.repository.TelegramTemplateRepository;
 import vn.edu.fpt.notification.service.TelegramService;
+import vn.edu.fpt.notification.service.UserInfoService;
 import vn.edu.fpt.notification.utils.ParamUtils;
 
 import java.util.List;
@@ -43,31 +44,32 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TelegramServiceImpl implements TelegramService {
 
-    private final TelegramBotService telegramBotService;
+//    private final TelegramBotService telegramBotService;
     private final TelegramTemplateRepository telegramTemplateRepository;
+    private final UserInfoService userInfoService;
     private final TelegramHistoryRepository telegramHistoryRepository;
     private final MongoTemplate mongoTemplate;
     private final ObjectMapper objectMapper;
 
 
     public void sendNotification(String templateId, SendTelegramRequest request) {
-        TelegramTemplate telegramTemplate = telegramTemplateRepository.findById(templateId)
-                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Telegram template id not exist!"));
-        String message = ParamUtils.replaceParams(telegramTemplate.getMessage(), request.getParams());
-        String status;
-        try {
-            telegramBotService.sendMessage(telegramTemplate.getChatId(), message);
-            status = AppConstant.SUCCESS;
-        } catch (Exception ex) {
-            status = AppConstant.FAILED;
-        }
-
-        telegramHistoryRepository.save(TelegramHistory.builder()
-                .template(telegramTemplate)
-                .params(request.getParams())
-                .message(message)
-                .status(status)
-                .build());
+//        TelegramTemplate telegramTemplate = telegramTemplateRepository.findById(templateId)
+//                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Telegram template id not exist!"));
+//        String message = ParamUtils.replaceParams(telegramTemplate.getMessage(), request.getParams());
+//        String status;
+//        try {
+//            telegramBotService.sendMessage(telegramTemplate.getChatId(), message);
+//            status = AppConstant.SUCCESS;
+//        } catch (Exception ex) {
+//            status = AppConstant.FAILED;
+//        }
+//
+//        telegramHistoryRepository.save(TelegramHistory.builder()
+//                .template(telegramTemplate)
+//                .params(request.getParams())
+//                .message(message)
+//                .status(status)
+//                .build());
     }
 
     @Override
@@ -174,9 +176,9 @@ public class TelegramServiceImpl implements TelegramService {
                 .channelId(telegramTemplate.getChatId())
                 .message(telegramTemplate.getMessage())
                 .params(telegramTemplate.getParams())
-                .createdBy(telegramTemplate.getCreatedBy())
+                .createdBy(userInfoService.getUserInfo(telegramTemplate.getCreatedBy()))
                 .createdDate(telegramTemplate.getCreatedDate())
-                .lastModifiedBy(telegramTemplate.getLastModifiedBy())
+                .lastModifiedBy(userInfoService.getUserInfo(telegramTemplate.getLastModifiedBy()))
                 .lastModifiedDate(telegramTemplate.getLastModifiedDate())
                 .build();
     }
