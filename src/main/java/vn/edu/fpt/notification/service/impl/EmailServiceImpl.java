@@ -17,6 +17,7 @@ import vn.edu.fpt.notification.config.security.annotation.IsAdmin;
 import vn.edu.fpt.notification.constant.AppConstant;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.common.UserInfoResponse;
 import vn.edu.fpt.notification.dto.event.SendEmailEvent;
 import vn.edu.fpt.notification.dto.request.email.*;
 import vn.edu.fpt.notification.dto.response.email.CreateEmailTemplateResponse;
@@ -306,9 +307,15 @@ public class EmailServiceImpl implements EmailService {
                 .subject(emailTemplate.getSubject())
                 .message(emailTemplate.getMessage())
                 .params(emailTemplate.getParams())
-                .createdBy(userInfoService.getUserInfo(emailTemplate.getCreatedBy()))
+                .createdBy(UserInfoResponse.builder()
+                        .accountId(emailTemplate.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(emailTemplate.getCreatedBy()))
+                        .build())
                 .createdDate(emailTemplate.getCreatedDate())
-                .lastModifiedBy(userInfoService.getUserInfo(emailTemplate.getLastModifiedBy()))
+                .lastModifiedBy(UserInfoResponse.builder()
+                        .accountId(emailTemplate.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(emailTemplate.getLastModifiedBy()))
+                        .build())
                 .lastModifiedDate(emailTemplate.getLastModifiedDate())
                 .build();
     }

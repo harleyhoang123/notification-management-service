@@ -15,6 +15,7 @@ import vn.edu.fpt.notification.config.security.annotation.IsAdmin;
 import vn.edu.fpt.notification.config.security.annotation.IsManager;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.common.UserInfoResponse;
 import vn.edu.fpt.notification.dto.request.display_message.CreateDisplayMessageRequest;
 import vn.edu.fpt.notification.dto.request.display_message.GetDisplayMessageRequest;
 import vn.edu.fpt.notification.dto.request.display_message.UpdateDisplayMessageRequest;
@@ -190,9 +191,15 @@ public class DisplayMessageServiceImpl implements DisplayMessageService {
                .displayMessageId(displayMessage.getDisplayMessageId())
                .message(displayMessage.getMessage())
                .code(displayMessage.getCode())
-               .createdBy(userInfoService.getUserInfo(displayMessage.getCreatedBy()))
+               .createdBy(UserInfoResponse.builder()
+                       .accountId(displayMessage.getCreatedBy())
+                       .userInfo(userInfoService.getUserInfo(displayMessage.getCreatedBy()))
+                       .build())
                .createdDate(displayMessage.getCreatedDate())
-               .lastModifiedBy(userInfoService.getUserInfo(displayMessage.getLastModifiedBy()))
+               .lastModifiedBy(UserInfoResponse.builder()
+                       .accountId(displayMessage.getCreatedBy())
+                       .userInfo(userInfoService.getUserInfo(displayMessage.getLastModifiedBy()))
+                       .build())
                .lastModifiedDate(displayMessage.getLastModifiedDate())
                 .build();
     }

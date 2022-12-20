@@ -12,6 +12,7 @@ import vn.edu.fpt.notification.config.security.annotation.IsAdmin;
 import vn.edu.fpt.notification.constant.AppConstant;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.common.UserInfoResponse;
 import vn.edu.fpt.notification.dto.event.SendTelegramEvent;
 import vn.edu.fpt.notification.dto.request.telegram.*;
 import vn.edu.fpt.notification.dto.response.telegram.CreateTelegramTemplateResponse;
@@ -176,9 +177,15 @@ public class TelegramServiceImpl implements TelegramService {
                 .channelId(telegramTemplate.getChatId())
                 .message(telegramTemplate.getMessage())
                 .params(telegramTemplate.getParams())
-                .createdBy(userInfoService.getUserInfo(telegramTemplate.getCreatedBy()))
+                .createdBy(UserInfoResponse.builder()
+                        .accountId(telegramTemplate.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(telegramTemplate.getCreatedBy()))
+                        .build())
                 .createdDate(telegramTemplate.getCreatedDate())
-                .lastModifiedBy(userInfoService.getUserInfo(telegramTemplate.getLastModifiedBy()))
+                .lastModifiedBy(UserInfoResponse.builder()
+                        .accountId(telegramTemplate.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(telegramTemplate.getLastModifiedBy()))
+                        .build())
                 .lastModifiedDate(telegramTemplate.getLastModifiedDate())
                 .build();
     }

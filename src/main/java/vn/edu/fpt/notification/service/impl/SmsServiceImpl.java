@@ -15,6 +15,7 @@ import vn.edu.fpt.notification.config.security.annotation.IsAdmin;
 import vn.edu.fpt.notification.constant.AppConstant;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.common.UserInfoResponse;
 import vn.edu.fpt.notification.dto.event.SendSmsEvent;
 import vn.edu.fpt.notification.dto.request.sms.*;
 import vn.edu.fpt.notification.dto.response.sms.CreateSmsTemplateResponse;
@@ -197,9 +198,15 @@ public class SmsServiceImpl implements SmsService {
                 .templateName(smsTemplate.getTemplateName())
                 .message(smsTemplate.getMessage())
                 .params(smsTemplate.getParams())
-                .createdBy(userInfoService.getUserInfo(smsTemplate.getCreatedBy()))
+                .createdBy(UserInfoResponse.builder()
+                        .accountId(smsTemplate.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(smsTemplate.getCreatedBy()))
+                        .build())
                 .createdDate(smsTemplate.getCreatedDate())
-                .lastModifiedBy(userInfoService.getUserInfo(smsTemplate.getLastModifiedBy()))
+                .lastModifiedBy(UserInfoResponse.builder()
+                        .accountId(smsTemplate.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(smsTemplate.getLastModifiedBy()))
+                        .build())
                 .lastModifiedDate(smsTemplate.getLastModifiedDate())
                 .build();
     }

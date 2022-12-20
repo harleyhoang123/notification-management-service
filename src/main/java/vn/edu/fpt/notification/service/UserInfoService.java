@@ -13,4 +13,5 @@ public interface UserInfoService {
 
     UserInfo getUserInfo(String accountId);
 
+    String getAccountId();
 }

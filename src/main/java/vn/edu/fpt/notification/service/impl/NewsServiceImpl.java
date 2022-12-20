@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.cache.UserInfo;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.common.UserInfoResponse;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.UpdateNewsRequest;
@@ -31,8 +32,6 @@ import vn.edu.fpt.notification.service.NewsService;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
 import vn.edu.fpt.notification.service.UserInfoService;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -153,9 +152,15 @@ public class NewsServiceImpl implements NewsService {
                 .content(news.getContent())
                 .views(news.getViews())
                 .comments(commentDetailResponses)
-                .createdBy(userInfoService.getUserInfo(news.getCreatedBy()))
+                .createdBy(UserInfoResponse.builder()
+                        .accountId(news.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(news.getCreatedBy()))
+                        .build())
                 .createdDate(news.getCreatedDate())
-                .lastModifiedBy(userInfoService.getUserInfo(news.getLastModifiedBy()))
+                .lastModifiedBy(UserInfoResponse.builder()
+                        .accountId(news.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(news.getLastModifiedBy()))
+                        .build())
                 .lastModifiedDate(news.getLastModifiedDate())
                 .build();
         news.setViews(currentViews + 1);
@@ -180,9 +185,15 @@ public class NewsServiceImpl implements NewsService {
                 .commentId(comment.getCommentId())
                 .content(comment.getContent())
                 .comments(getCommentDetailResponses)
-                .createdBy(userInfoService.getUserInfo(comment.getCreatedBy()))
+                .createdBy(UserInfoResponse.builder()
+                        .accountId(comment.getCreatedBy())
+                        .userInfo(userInfoService.getUserInfo(comment.getCreatedBy()))
+                        .build())
                 .createdDate(comment.getCreatedDate())
-                .lastModifiedBy(userInfoService.getUserInfo(comment.getLastModifiedBy()))
+                .lastModifiedBy(UserInfoResponse.builder()
+                        .accountId(comment.getLastModifiedBy())
+                        .userInfo(userInfoService.getUserInfo(comment.getCreatedBy()))
+                        .build())
                 .lastModifiedDate(comment.getLastModifiedDate())
                 .build();
     }
@@ -247,6 +258,13 @@ public class NewsServiceImpl implements NewsService {
                 .createdDate(news.getCreatedDate())
                 .views(news.getViews())
                 .comments(news.getComments().size())
+                .build();
+    }
+
+    private UserInfoResponse convertUserInfoToUserInfoResponse(UserInfo userInfo) {
+        return UserInfoResponse.builder()
+                .accountId(userInfoService.getAccountId())
+                .userInfo(userInfo)
                 .build();
     }
 }
