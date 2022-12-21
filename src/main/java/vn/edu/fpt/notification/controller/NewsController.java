@@ -29,7 +29,8 @@ public interface NewsController {
     ResponseEntity<GeneralResponse<PageableResponse<GetNewsResponse>>> getNews(
             @RequestParam(name = "title", required = false) String title,
             @RequestParam(name = "page", required = false) Integer page,
-            @RequestParam(name = "size", required = false) Integer size
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "created-date-sort-by", required = false) String createdDateSortBy
             );
 
     @PostMapping("/{news-id}/comment")

@@ -204,15 +204,16 @@ public class NewsServiceImpl implements NewsService {
         if (Objects.nonNull(request.getTitle())) {
             query.addCriteria(Criteria.where("title").regex(request.getTitle()));
         }
-        query.with(Sort.by(Sort.Direction.DESC, "created_date"));
 
+        //query.with(Sort.by(Sort.Direction.DESC, "created_date"));
+        BaseMongoRepository.addCriteriaWithAuditable(query, request);
         Long totalElements = mongoTemplate.count(query, News.class);
-
         BaseMongoRepository.addCriteriaWithPageable(query, request);
+        BaseMongoRepository.addCriteriaWithSorted(query, request);
 
         List<News> news = mongoTemplate.find(query, News.class);
-
         List<GetNewsResponse> getNewsResponses = news.stream().map(this::convertNewsToGetNewsResponse).collect(Collectors.toList());
+
         return new PageableResponse<>(request, totalElements, getNewsResponses);
     }
 

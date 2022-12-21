@@ -8,6 +8,7 @@ import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.controller.NewsController;
 import vn.edu.fpt.notification.dto.common.GeneralResponse;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
+import vn.edu.fpt.notification.dto.common.SortableRequest;
 import vn.edu.fpt.notification.dto.request.comment._CreateCommentRequest;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
@@ -19,6 +20,10 @@ import vn.edu.fpt.notification.dto.response.news.GetNewsResponse;
 import vn.edu.fpt.notification.factory.ResponseFactory;
 import vn.edu.fpt.notification.service.CommentService;
 import vn.edu.fpt.notification.service.NewsService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @RestController
 @Slf4j
@@ -53,11 +58,20 @@ public class NewsControllerImpl implements NewsController {
     }
 
     @Override
-    public ResponseEntity<GeneralResponse<PageableResponse<GetNewsResponse>>> getNews(String title, Integer page, Integer size) {
+    public ResponseEntity<GeneralResponse<PageableResponse<GetNewsResponse>>> getNews(
+            String title,
+            Integer page,
+            Integer size,
+            String createdDateSortBy) {
+        List<SortableRequest> sortableRequests = new ArrayList<>();
+        if(Objects.nonNull(createdDateSortBy)){
+            sortableRequests.add(new SortableRequest("created_date", createdDateSortBy));
+        }
         GetNewsRequest request = GetNewsRequest.builder()
                 .title(title)
                 .page(page)
                 .size(size)
+                .sortBy(sortableRequests)
                 .build();
         return responseFactory.response(newsService.getNews(request));
     }
