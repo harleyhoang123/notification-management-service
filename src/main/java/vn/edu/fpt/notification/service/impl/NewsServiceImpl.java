@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import vn.edu.fpt.notification.constant.ResponseStatusEnum;
 import vn.edu.fpt.notification.dto.cache.UserInfo;
 import vn.edu.fpt.notification.dto.common.PageableResponse;
-import vn.edu.fpt.notification.dto.common.UserInfoResponse;
 import vn.edu.fpt.notification.dto.request.news.CreateNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.GetNewsRequest;
 import vn.edu.fpt.notification.dto.request.news.UpdateNewsRequest;
@@ -32,6 +31,8 @@ import vn.edu.fpt.notification.service.NewsService;
 import vn.edu.fpt.notification.service.S3BucketStorageService;
 import vn.edu.fpt.notification.service.UserInfoService;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -152,15 +153,9 @@ public class NewsServiceImpl implements NewsService {
                 .content(news.getContent())
                 .views(news.getViews())
                 .comments(commentDetailResponses)
-                .createdBy(UserInfoResponse.builder()
-                        .accountId(news.getCreatedBy())
-                        .userInfo(userInfoService.getUserInfo(news.getCreatedBy()))
-                        .build())
+                .createdBy(userInfoService.getUserInfo(news.getCreatedBy()))
                 .createdDate(news.getCreatedDate())
-                .lastModifiedBy(UserInfoResponse.builder()
-                        .accountId(news.getCreatedBy())
-                        .userInfo(userInfoService.getUserInfo(news.getLastModifiedBy()))
-                        .build())
+                .lastModifiedBy(userInfoService.getUserInfo(news.getLastModifiedBy()))
                 .lastModifiedDate(news.getLastModifiedDate())
                 .build();
         news.setViews(currentViews + 1);
@@ -174,28 +169,26 @@ public class NewsServiceImpl implements NewsService {
     }
 
     private GetCommentDetailResponse convertCommentToGetCommentResponse(Comment comment) {
-        List<Comment> comments = comment.getComments();
-        List<GetCommentDetailResponse> getCommentDetailResponses;
-        if (!comments.isEmpty()) {
-            getCommentDetailResponses = comments.stream().map(this::convertCommentToGetCommentResponse).collect(Collectors.toList());
-        } else {
-            getCommentDetailResponses = new ArrayList<>();
+        if (Objects.isNull(comment)) return null;
+        else {
+            List<Comment> comments = comment.getComments();
+            List<GetCommentDetailResponse> getCommentDetailResponses;
+            if (!comments.isEmpty()) {
+                getCommentDetailResponses = comments.stream().map(this::convertCommentToGetCommentResponse).collect(Collectors.toList());
+            } else {
+                getCommentDetailResponses = new ArrayList<>();
+            }
+            return GetCommentDetailResponse.builder()
+                    .commentId(comment.getCommentId())
+                    .content(comment.getContent())
+                    .comments(getCommentDetailResponses)
+                    .createdBy(userInfoService.getUserInfo(comment.getCreatedBy()))
+                    .createdDate(comment.getCreatedDate())
+                    .lastModifiedBy(userInfoService.getUserInfo(comment.getLastModifiedBy()))
+                    .lastModifiedDate(comment.getLastModifiedDate())
+                    .build();
         }
-        return GetCommentDetailResponse.builder()
-                .commentId(comment.getCommentId())
-                .content(comment.getContent())
-                .comments(getCommentDetailResponses)
-                .createdBy(UserInfoResponse.builder()
-                        .accountId(comment.getCreatedBy())
-                        .userInfo(userInfoService.getUserInfo(comment.getCreatedBy()))
-                        .build())
-                .createdDate(comment.getCreatedDate())
-                .lastModifiedBy(UserInfoResponse.builder()
-                        .accountId(comment.getLastModifiedBy())
-                        .userInfo(userInfoService.getUserInfo(comment.getCreatedBy()))
-                        .build())
-                .lastModifiedDate(comment.getLastModifiedDate())
-                .build();
+
     }
 
     @Override
@@ -204,16 +197,15 @@ public class NewsServiceImpl implements NewsService {
         if (Objects.nonNull(request.getTitle())) {
             query.addCriteria(Criteria.where("title").regex(request.getTitle()));
         }
+        query.with(Sort.by(Sort.Direction.DESC, "created_date"));
 
-        //query.with(Sort.by(Sort.Direction.DESC, "created_date"));
-        BaseMongoRepository.addCriteriaWithAuditable(query, request);
         Long totalElements = mongoTemplate.count(query, News.class);
+
         BaseMongoRepository.addCriteriaWithPageable(query, request);
-        BaseMongoRepository.addCriteriaWithSorted(query, request);
 
         List<News> news = mongoTemplate.find(query, News.class);
-        List<GetNewsResponse> getNewsResponses = news.stream().map(this::convertNewsToGetNewsResponse).collect(Collectors.toList());
 
+        List<GetNewsResponse> getNewsResponses = news.stream().map(this::convertNewsToGetNewsResponse).collect(Collectors.toList());
         return new PageableResponse<>(request, totalElements, getNewsResponses);
     }
 
@@ -259,13 +251,6 @@ public class NewsServiceImpl implements NewsService {
                 .createdDate(news.getCreatedDate())
                 .views(news.getViews())
                 .comments(news.getComments().size())
-                .build();
-    }
-
-    private UserInfoResponse convertUserInfoToUserInfoResponse(UserInfo userInfo) {
-        return UserInfoResponse.builder()
-                .accountId(userInfoService.getAccountId())
-                .userInfo(userInfo)
                 .build();
     }
 }
