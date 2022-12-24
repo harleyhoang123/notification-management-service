@@ -21,7 +21,7 @@ public class SendSmsConsumer extends Consumer{
     private final SmsService smsService;
 
     @Override
-    @KafkaListener(id = "sendSmsConsumer", topics = "flab.notification.send_sms", groupId = "notification_group")
+    @KafkaListener(id = "sendSmsConsumer", topics = "flab.notification.send_sms", groupId = "notification_sms_group")
     protected void listen(String value, String topic, String key) {
         super.listen(value, topic, key);
         smsService.sendSms(value);
