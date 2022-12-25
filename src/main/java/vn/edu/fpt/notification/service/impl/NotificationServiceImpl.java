@@ -54,7 +54,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public GetNotifyResponse getNotify(String accountId) {
         Notification notification = notificationRepository.getNotificationByAccountId(accountId)
-                .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Account Id not exist"));
+                .orElse(Notification.builder()
+                        .accountId(accountId)
+                        .build());
         List<NotifyContent> notifyContents = notification.getContents();
         List<NotifyContent> unreadContent = notifyContents.stream().filter(v -> !v.getIsRead()).limit(20).collect(Collectors.toList());
         List<NotifyContent> notifyContentList = new ArrayList<>();
@@ -93,7 +95,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public GetNumberNotifyResponse getNumberNotifyByAccountId(String accountId) {
-        Notification notification = notificationRepository.getNotificationByAccountId(accountId).orElseThrow();
+        Notification notification = notificationRepository.getNotificationByAccountId(accountId).orElse(Notification.builder().contents(new ArrayList<>()).build());
         List<NotifyContent> notifyContents = notification.getContents();
         Long notifies = notifyContents.stream().filter(v -> !v.getIsRead()).count();
         return GetNumberNotifyResponse.builder()
