@@ -20,10 +20,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-@JsonPropertyOrder({"content", "createdDate"})
+@JsonPropertyOrder({"content", "createdDate", "read"})
 public class NotifyContentResponse implements Serializable {
 
     private static final long serialVersionUID = -2135306334320965034L;
     private String content;
     private LocalDateTime createdDate;
+    private boolean read;
 }

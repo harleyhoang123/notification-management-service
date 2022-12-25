@@ -14,6 +14,7 @@ import vn.edu.fpt.notification.exception.BusinessException;
 import vn.edu.fpt.notification.repository.NotificationRepository;
 import vn.edu.fpt.notification.service.NotificationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,29 +57,37 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new BusinessException(ResponseStatusEnum.BAD_REQUEST, "Account Id not exist"));
         List<NotifyContent> notifyContents = notification.getContents();
         List<NotifyContent> unreadContent = notifyContents.stream().filter(v -> !v.getIsRead()).limit(20).collect(Collectors.toList());
-        notifyContents.stream().filter(v -> !v.getIsRead())
+        List<NotifyContent> notifyContentList = new ArrayList<>();
+        notifyContentList.addAll(unreadContent);
+        if (unreadContent.size() < 20) {
+            notifyContentList.addAll(notifyContents.stream().filter(v -> v.getIsRead()).limit(20 - unreadContent.size()).collect(Collectors.toList()));
+        }
+        GetNotifyResponse response = GetNotifyResponse.builder()
+                .notifyId(notification.getNotifyId())
+                .accountId(accountId)
+                .contents(notifyContentList.stream().map(this::convertNotifyResponse).collect(Collectors.toList()))
+                .build();
+        notifyContentList.stream().filter(v -> !v.getIsRead())
                 .forEach(v -> {
                     if (unreadContent.contains(v)) {
                         v.setIsRead(true);
                     }
                 });
-        notification.setContents(notifyContents);
+
+        notification.setContents(notifyContentList);
         try {
             notificationRepository.save(notification);
         } catch (Exception ex) {
             throw new BusinessException("Can't save notification to database: " + ex.getMessage());
         }
-        return GetNotifyResponse.builder()
-                .notifyId(notification.getNotifyId())
-                .accountId(accountId)
-                .contents(unreadContent.stream().map(this::convertNotifyResponse).collect(Collectors.toList()))
-                .build();
+        return response;
     }
 
     private NotifyContentResponse convertNotifyResponse(NotifyContent notifyContent) {
         return NotifyContentResponse.builder()
                 .content(notifyContent.getContent())
                 .createdDate(notifyContent.getCreatedDate())
+                .read(notifyContent.getIsRead())
                 .build();
     }
 
