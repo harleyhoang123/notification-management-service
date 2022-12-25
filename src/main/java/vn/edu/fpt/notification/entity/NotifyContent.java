@@ -32,6 +32,5 @@ public class NotifyContent {
     @Builder.Default
     private Boolean isRead = false;
     @Field(name = "created_date")
-    @CreatedDate
     private LocalDateTime createdDate;
 }

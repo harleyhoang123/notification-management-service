@@ -42,6 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
             List<NotifyContent> notifyContents = notification.getContents();
             notifyContents.add(NotifyContent.builder()
                     .content(event.getContent())
+                    .createdDate(event.getCreatedDate())
                     .build());
             notificationRepository.save(notification);
         } catch (Exception ex) {
@@ -57,15 +58,15 @@ public class NotificationServiceImpl implements NotificationService {
         List<NotifyContent> unreadContent = notifyContents.stream().filter(v -> !v.getIsRead()).limit(20).collect(Collectors.toList());
         notifyContents.stream().filter(v -> !v.getIsRead())
                 .forEach(v -> {
-                    if(unreadContent.contains(v)){
+                    if (unreadContent.contains(v)) {
                         v.setIsRead(true);
                     }
                 });
         notification.setContents(notifyContents);
-        try{
+        try {
             notificationRepository.save(notification);
-        }catch (Exception ex){
-            throw new BusinessException("Can't save notification to database: "+ ex.getMessage());
+        } catch (Exception ex) {
+            throw new BusinessException("Can't save notification to database: " + ex.getMessage());
         }
         return GetNotifyResponse.builder()
                 .notifyId(notification.getNotifyId())
@@ -74,7 +75,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
     }
 
-    private NotifyContentResponse convertNotifyResponse(NotifyContent notifyContent){
+    private NotifyContentResponse convertNotifyResponse(NotifyContent notifyContent) {
         return NotifyContentResponse.builder()
                 .content(notifyContent.getContent())
                 .createdDate(notifyContent.getCreatedDate())
