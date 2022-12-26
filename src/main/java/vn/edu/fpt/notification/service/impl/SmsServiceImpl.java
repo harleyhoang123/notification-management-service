@@ -54,11 +54,6 @@ public class SmsServiceImpl implements SmsService {
     private final ObjectMapper objectMapper;
     private final UserInfoService userInfoService;
 
-    @Value("${app.sms.service-sid}")
-    private String notificationServiceSid;
-    @Value("${app.sms.service-verify-sid}")
-    private String verificationServiceSid;
-
     @Override
     public void sendSms(String templateId, SendSmsRequest request) {
         SmsTemplate smsTemplate = smsTemplateRepository.findById(templateId)
@@ -74,10 +69,10 @@ public class SmsServiceImpl implements SmsService {
 
         try {
             Message twilioMessage = Message.creator(
-                    new PhoneNumber(request.getSendTo()),
-                    notificationServiceSid,
-                    message
-            ).create();
+                            new com.twilio.type.PhoneNumber(request.getSendTo()),
+                            new com.twilio.type.PhoneNumber("+15084069533"),
+                            message)
+                    .create();
             log.info("Send sms {} with sid: {}", twilioMessage.getStatus(), twilioMessage.getSid());
             smsHistory.setStatus(AppConstant.SUCCESS);
         } catch (Exception ex) {
